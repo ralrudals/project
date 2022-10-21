@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardns">
+
+				<!-- 글작성 -->
+		<insert id="insert" parameterType="board">
+			insert into myboard values(myboard_seq.nextval, #{writer},
+			#{passwd}, #{subject}, #{content}, 0, sysdate)
+		</insert>
+		
+		<select id="count" resultType="int">
+			select count(*) from myboard
+		</select>
+		
+		<select id="list" parameterType="int" resultType="board">
+			<![CDATA[
+			select * from (select rownum rnum, board.* from (
+			select * from myboard order by no desc) board ) 
+			where rnum >= ((#{page} - 1) * 10 + 1) and
+			rnum <= (#{page} * 10)
+			]]>
+		</select>
+		
+		<update id="hit" parameterType="int">
+			update myboard set readcount = readcount + 1 where no = #{no}
+		</update>
+		
+		<select id="content" parameterType="int" resultType="board">
+			select * from myboard where no = #{no}
+		</select>
+		
+		<update id="update">
+			update myboard set writer = #{writer}, subject = #{subject}, content = #{content},
+				register = sysdate where no = #{no}
+		</update>
+		
+		<delete id="delete" parameterType="int">
+			delete from myboard where no = #{no}
+		</delete>
+</mapper>
